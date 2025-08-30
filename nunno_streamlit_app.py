@@ -24,8 +24,12 @@ except Exception:
     monte_carlo_summary = None
 
 # API keys (recommended to put into Streamlit secrets)
-AI_API_KEY = st.secrets.get("AI_API_KEY", "")
-NEWS_API_KEY = st.secrets.get("NEWS_API_KEY", "")
+try:
+    AI_API_KEY = st.secrets.get("AI_API_KEY", "")
+    NEWS_API_KEY = st.secrets.get("NEWS_API_KEY", "")
+except:
+    AI_API_KEY = ""
+    NEWS_API_KEY = ""
 
 SYSTEM_PROMPT = (
     "You are Nunno, a friendly AI (Numinous Nexus AI). "
@@ -37,6 +41,566 @@ SYSTEM_PROMPT = (
 )
 
 MAX_HISTORY_MESSAGES = 20
+
+def get_theme_css(theme):
+    """Generate CSS for professional dark/light mode themes"""
+    if theme == "dark":
+        return """
+        <style>
+        /* Global transition for smooth theme switching */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+        }
+        
+        .stApp {
+            background: #1a1a1a;
+            color: #ffffff !important;
+            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+        
+        /* Fix Streamlit header - the white bar at the top */
+        header[data-testid="stHeader"],
+        .stAppHeader,
+        .st-emotion-cache-1eyfjps {
+            background: #1a1a1a !important;
+            background-color: #1a1a1a !important;
+            border-bottom: 1px solid #30363d !important;
+        }
+        
+        /* Fix the decoration bar inside header */
+        .stDecoration,
+        .st-emotion-cache-1dp5vir {
+            background: #1a1a1a !important;
+            background-color: #1a1a1a !important;
+        }
+        
+        /* Fix toolbar area */
+        .stAppToolbar,
+        .st-emotion-cache-15ecox0 {
+            background: #1a1a1a !important;
+            background-color: #1a1a1a !important;
+        }
+        
+        /* Fix toolbar actions */
+        .stToolbarActions,
+        .st-emotion-cache-1p1m4ay {
+            background: #1a1a1a !important;
+        }
+        
+        /* Style the Deploy button and menu in header */
+        button[data-testid="stBaseButton-header"],
+        button[data-testid="stBaseButton-headerNoPadding"],
+        .st-emotion-cache-usvq0g,
+        .st-emotion-cache-1w7bu1y {
+            background: #30363d !important;
+            color: #ffffff !important;
+            border: 1px solid #484f58 !important;
+        }
+        
+        /* Hide or style the main menu */
+        .stMainMenu {
+            background: #1a1a1a !important;
+        }
+        
+        /* Sidebar styling */
+        .css-1d391kg, .css-1lcbmhc, section[data-testid="stSidebar"] {
+            background: #161b22 !important;
+            border-right: 1px solid #30363d;
+        }
+        
+        .css-1d391kg *, .css-1lcbmhc *, section[data-testid="stSidebar"] * {
+            color: #ffffff !important;
+        }
+        
+        /* Nuclear approach for white bar above chat */
+        .stApp > div {
+            background: #1a1a1a !important;
+        }
+        
+        .stApp > div > div {
+            background: #1a1a1a !important;
+        }
+        
+        .stApp > div > div > div {
+            background: #1a1a1a !important;
+        }
+        
+        .stApp > div > div > div > div {
+            background: #1a1a1a !important;
+        }
+        
+        /* Target all possible main content wrappers */
+        .main, 
+        .main > div,
+        .main > div > div,
+        .main > div > div > div,
+        div[data-testid="block-container"],
+        div[data-testid="stVerticalBlock"],
+        div[data-testid="column"] {
+            background: #1a1a1a !important;
+            background-color: #1a1a1a !important;
+        }
+        
+        /* Override any element that might be white */
+        .stApp div:not([data-testid="stChatMessage"]):not(.stFileUploader):not(.stButton) {
+            background: transparent !important;
+        }
+        
+        /* Specific fix for main container */
+        .css-1y4p8pa, .css-12oz5g7, .css-1629p8f {
+            background: #1a1a1a !important;
+        }
+        
+        /* Chat messages */
+        .stChatMessage {
+            background: #21262d !important;
+            border: 1px solid #30363d !important;
+            border-radius: 8px !important;
+            margin: 1rem 0;
+            padding: 1rem;
+        }
+        
+        .stChatMessage * {
+            color: #ffffff !important;
+        }
+        
+        /* Headers */
+        h1, h2, h3, h4, h5, h6 {
+            color: #ffffff !important;
+            font-weight: 600;
+        }
+        
+        /* Buttons */
+        .stButton > button {
+            background: #238636 !important;
+            color: white !important;
+            border: 1px solid #2ea043 !important;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            font-size: 14px;
+        }
+        
+        .stButton > button:hover {
+            background: #2ea043 !important;
+        }
+        
+        /* Theme toggle button - Exact selector targeting */
+        button[data-testid="stBaseButton-secondary"][kind="secondary"] {
+            background: #30363d !important;
+            color: #ffffff !important;
+            border: 1px solid #484f58 !important;
+            border-radius: 6px !important;
+            padding: 0.4rem 0.6rem !important;
+            min-width: 42px !important;
+            height: 38px !important;
+        }
+        
+        /* Target the specific emotion-cache class if needed */
+        .st-emotion-cache-qm7g72 {
+            background: #30363d !important;
+            color: #ffffff !important;
+            border: 1px solid #484f58 !important;
+            border-radius: 6px !important;
+        }
+        
+        /* Target the inner markdown container and paragraph */
+        button[data-testid="stBaseButton-secondary"] .st-emotion-cache-p7i6r9,
+        button[data-testid="stBaseButton-secondary"] .st-emotion-cache-p7i6r9 p {
+            color: #ffffff !important;
+        }
+        
+        /* Backup selector using the button structure */
+        button[kind="secondary"]:has(div[data-testid="stMarkdownContainer"]) {
+            background: #30363d !important;
+            color: #ffffff !important;
+            border: 1px solid #484f58 !important;
+        }
+        
+        /* Input fields - FIXED for dark mode visibility */
+        .stTextInput > div > div > input, 
+        .stTextArea > div > div > textarea, 
+        .stChatInput > div > div > input {
+            background: #21262d !important;
+            border: 1px solid #30363d !important;
+            color: #ffffff !important;
+            border-radius: 6px;
+        }
+        
+        .stTextInput > div > div > input::placeholder,
+        .stTextArea > div > div > textarea::placeholder,
+        .stChatInput > div > div > input::placeholder {
+            color: #8b949e !important;
+            opacity: 1 !important;
+            transition: color 0.3s ease !important;
+        }
+        
+        .stTextInput > div > div > input:focus, 
+        .stTextArea > div > div > textarea:focus, 
+        .stChatInput > div > div > input:focus {
+            border-color: #388bfd !important;
+            box-shadow: 0 0 0 2px rgba(56, 139, 253, 0.3) !important;
+        }
+        
+        /* Chat input styling - Nuclear approach for stubborn Streamlit styling */
+        [data-testid="stChatInput"],
+        [data-testid="stChatInput"] > div,
+        [data-testid="stChatInput"] > div > div,
+        [data-testid="stChatInput"] > div > div > div {
+            background: #21262d !important;
+            background-color: #21262d !important;
+            border: 1px solid #30363d !important;
+            border-radius: 6px !important;
+        }
+        
+        [data-testid="stChatInput"] input,
+        [data-testid="stChatInput"] textarea,
+        [data-testid="stChatInput"] > div input,
+        [data-testid="stChatInput"] > div textarea,
+        [data-testid="stChatInput"] > div > div input,
+        [data-testid="stChatInput"] > div > div textarea,
+        [data-testid="stChatInput"] > div > div > div input,
+        [data-testid="stChatInput"] > div > div > div textarea {
+            background: #21262d !important;
+            background-color: #21262d !important;
+            color: #ffffff !important;
+            border: none !important;
+            border-color: transparent !important;
+        }
+        
+        [data-testid="stChatInput"] input::placeholder,
+        [data-testid="stChatInput"] textarea::placeholder {
+            color: #8b949e !important;
+        }
+        
+        /* Catch-all for any remaining chat input elements */
+        .stApp [data-testid="stChatInput"] * {
+            background: #21262d !important;
+            color: #ffffff !important;
+        }
+        
+        /* Override any emotion-cache classes that might be interfering */
+        div[class*="st-emotion-cache"] input,
+        div[class*="st-emotion-cache"] textarea {
+            background: #21262d !important;
+            color: #ffffff !important;
+        }
+        
+        /* File uploader - FIXED for dark mode */
+        .stFileUploader > div {
+            background: #21262d !important;
+            border: 1px dashed #30363d !important;
+            border-radius: 6px;
+            color: #ffffff !important;
+        }
+        
+        .stFileUploader * {
+            color: #ffffff !important;
+        }
+        
+        /* File uploader button and text */
+        .stFileUploader label {
+            color: #ffffff !important;
+        }
+        
+        .stFileUploader button {
+            background: #30363d !important;
+            color: #ffffff !important;
+            border: 1px solid #484f58 !important;
+        }
+        
+        /* File uploader drag area */
+        .stFileUploader [data-testid="stFileUploaderDropzone"] {
+            background: #21262d !important;
+            border: 2px dashed #30363d !important;
+            color: #ffffff !important;
+        }
+        
+        .stFileUploader [data-testid="stFileUploaderDropzone"] * {
+            color: #ffffff !important;
+        }
+        
+        /* Success/Error messages */
+        .stSuccess {
+            background: #238636 !important;
+            border: 1px solid #2ea043 !important;
+            color: white !important;
+            border-radius: 6px;
+        }
+        
+        .stError, .stWarning {
+            background: #da3633 !important;
+            border: 1px solid #f85149 !important;
+            color: white !important;
+            border-radius: 6px;
+        }
+        
+        .stInfo {
+            background: #1f6feb !important;
+            border: 1px solid #388bfd !important;
+            color: white !important;
+            border-radius: 6px;
+        }
+        
+        /* Tables */
+        .stDataFrame {
+            background: #21262d !important;
+            border-radius: 6px;
+            border: 1px solid #30363d;
+        }
+        
+        .stDataFrame * {
+            color: #ffffff !important;
+            background: #21262d !important;
+        }
+        
+        /* Metrics */
+        div[data-testid="metric-container"] {
+            background: #21262d !important;
+            border: 1px solid #30363d !important;
+            border-radius: 6px !important;
+            padding: 1rem;
+        }
+        
+        div[data-testid="metric-container"] * {
+            color: #ffffff !important;
+        }
+        
+        /* Expanders */
+        .streamlit-expanderHeader {
+            background: #21262d !important;
+            color: #ffffff !important;
+        }
+        
+        .streamlit-expanderContent {
+            background: #161b22 !important;
+            border: 1px solid #30363d !important;
+        }
+        
+        /* Select boxes */
+        .stSelectbox * {
+            color: #ffffff !important;
+            background: #21262d !important;
+        }
+        
+        /* Select box dropdown */
+        .stSelectbox > div > div {
+            background: #21262d !important;
+            border: 1px solid #30363d !important;
+        }
+        
+        .stSelectbox option {
+            background: #21262d !important;
+            color: #ffffff !important;
+        }
+        
+        /* Markdown text */
+        .stMarkdown * {
+            color: #ffffff !important;
+        }
+        
+        /* Labels for inputs */
+        label {
+            color: #ffffff !important;
+        }
+        
+        /* Progress bars */
+        .stProgress > div > div {
+            background: #238636 !important;
+        }
+        
+        /* Sliders */
+        .stSlider * {
+            color: #ffffff !important;
+        }
+        
+        /* Number input */
+        .stNumberInput > div > div > input {
+            background: #21262d !important;
+            border: 1px solid #30363d !important;
+            color: #ffffff !important;
+        }
+        
+        /* Date input */
+        .stDateInput > div > div > input {
+            background: #21262d !important;
+            border: 1px solid #30363d !important;
+            color: #ffffff !important;
+        }
+        
+        /* Time input */
+        .stTimeInput > div > div > input {
+            background: #21262d !important;
+            border: 1px solid #30363d !important;
+            color: #ffffff !important;
+        }
+        
+        /* Code blocks */
+        .stCodeBlock {
+            background: #0d1117 !important;
+            border: 1px solid #30363d !important;
+        }
+        
+        .stCodeBlock * {
+            color: #e6edf3 !important;
+        }
+        </style>
+        """
+    else:  # light theme
+        return """
+        <style>
+        /* Global transition for smooth theme switching */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+        }
+        
+        .stApp {
+            background: #ffffff;
+            color: #1a202c !important;
+            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+        
+        /* Global text color */
+        .stApp * {
+            color: #1a202c !important;
+        }
+        
+        /* Sidebar styling */
+        .css-1d391kg, .css-1lcbmhc, section[data-testid="stSidebar"] {
+            background: #f7fafc !important;
+            border-right: 1px solid #e2e8f0;
+        }
+        
+        .css-1d391kg *, .css-1lcbmhc *, section[data-testid="stSidebar"] * {
+            color: #1a202c !important;
+        }
+        
+        /* Main content area */
+        .main .block-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+        }
+        
+        /* Chat messages */
+        .stChatMessage {
+            background: rgba(247, 250, 252, 0.8) !important;
+            border: 1px solid #cbd5e0 !important;
+            border-radius: 12px !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+            margin: 1rem 0;
+            padding: 1rem;
+        }
+        
+        /* User messages */
+        div[data-testid="stChatMessageContainer"]:has(div[data-testid="chatAvatarIcon-user"]) {
+            background: linear-gradient(135deg, #3182ce 0%, #2b77cb 100%) !important;
+            border: 1px solid #4299e1 !important;
+            color: white !important;
+        }
+        
+        /* Assistant messages */
+        div[data-testid="stChatMessageContainer"]:has(div[data-testid="chatAvatarIcon-assistant"]) {
+            background: linear-gradient(135deg, #38a169 0%, #48bb78 100%) !important;
+            border: 1px solid #68d391 !important;
+            color: white !important;
+        }
+        
+        /* Headers */
+        h1, h2, h3, h4, h5, h6 {
+            color: #2d3748 !important;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #3182ce !important;
+            background: linear-gradient(90deg, #3182ce, #4299e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Buttons */
+        .stButton > button {
+            background: linear-gradient(135deg, #3182ce 0%, #2b77cb 100%) !important;
+            color: white !important;
+            border: 1px solid #4299e1 !important;
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
+        }
+        
+        .stButton > button:hover {
+            background: linear-gradient(135deg, #2c5aa0 0%, #2a69ac 100%) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(49, 130, 206, 0.4);
+        }
+        
+        /* Input fields */
+        .stTextInput > div > div > input, .stTextArea > div > div > textarea, .stChatInput > div > div > input {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border: 2px solid #e2e8f0 !important;
+            color: #2d3748 !important;
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-size: 16px;
+        }
+        
+        .stTextInput > div > div > input:focus, .stTextArea > div > div > textarea:focus, .stChatInput > div > div > input:focus {
+            border-color: #3182ce !important;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2) !important;
+        }
+        
+        /* File uploader */
+        .stFileUploader > div {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border: 2px dashed #e2e8f0 !important;
+            border-radius: 8px;
+            padding: 2rem;
+        }
+        
+        /* Success/Error messages */
+        .stSuccess {
+            background: linear-gradient(135deg, #38a169 0%, #48bb78 100%) !important;
+            border: 1px solid #68d391 !important;
+            color: white !important;
+            border-radius: 8px;
+        }
+        
+        .stError {
+            background: linear-gradient(135deg, #e53e3e 0%, #fc8181 100%) !important;
+            border: 1px solid #feb2b2 !important;
+            color: white !important;
+            border-radius: 8px;
+        }
+        
+        /* Tables */
+        .stDataFrame {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        /* Metrics */
+        div[data-testid="metric-container"] {
+            background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%) !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 8px !important;
+            padding: 1rem;
+        }
+        
+        /* Toggle switch */
+        .stToggle > label {
+            color: #2d3748 !important;
+            font-weight: 500;
+        }
+        </style>
+        """
 
 def manage_history_length(history_list):
     if not history_list:
@@ -265,6 +829,13 @@ def is_prediction_request(text):
 # ---------------------------
 st.set_page_config(page_title="Nunno AI", page_icon="🧠", layout="wide")
 
+# Theme state management
+if "theme" not in st.session_state:
+    st.session_state.theme = "dark"
+
+# Apply theme CSS
+st.markdown(get_theme_css(st.session_state.theme), unsafe_allow_html=True)
+
 # session state initialization
 if "conversation" not in st.session_state:
     st.session_state.conversation = [{"role":"system", "content": SYSTEM_PROMPT.format(user_name="User", user_age="N/A")}]
@@ -274,10 +845,21 @@ if "user_age" not in st.session_state:
     st.session_state.user_age = "N/A"
 if "uploaded_b64" not in st.session_state:
     st.session_state.uploaded_b64 = None
+if "chart_analysis" not in st.session_state:
+    st.session_state.chart_analysis = None
 
 # sidebar
 with st.sidebar:
-    st.header("Profile & Controls")
+    # Header with simple theme toggle
+    col1, col2 = st.columns([4, 1])
+    with col1:
+        st.header("Profile & Controls")
+    with col2:
+        # Simple toggle button
+        if st.button("◐", help="Toggle theme", key="theme_toggle"):
+            st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
+            st.rerun()
+    
     st.session_state.user_name = st.text_input("Your name", st.session_state.user_name)
     st.session_state.user_age = st.text_input("Your age (optional)", st.session_state.user_age)
     if st.button("Start New Chat"):
@@ -290,6 +872,13 @@ with st.sidebar:
     if uploaded is not None:
         st.session_state.uploaded_b64 = base64.b64encode(uploaded.read()).decode("utf-8")
         st.success("Chart uploaded and ready for analysis.")
+        
+        # Add analyze button when chart is uploaded
+        if st.button("🔍 Analyze Chart", key="analyze_chart_btn"):
+            with st.spinner("Analyzing chart..."):
+                result = analyze_chart(st.session_state.uploaded_b64)
+                st.session_state.chart_analysis = result
+            st.rerun()
 
     st.markdown("---")
     st.subheader("Quick Examples")
@@ -342,11 +931,11 @@ with col1:
                     
                     # Display prediction header
                     if isinstance(bias, str) and "bullish" in bias.lower():
-                        st.success(f"🎯 {symbol} ({tf}) — Bias: {bias} ({strength:.1f}% confidence)")
+                        st.success(f"🎯 {symbol} ({tf}) – Bias: {bias} ({strength:.1f}% confidence)")
                     elif isinstance(bias, str) and "bearish" in bias.lower():
-                        st.error(f"🎯 {symbol} ({tf}) — Bias: {bias} ({strength:.1f}% confidence)")
+                        st.error(f"🎯 {symbol} ({tf}) – Bias: {bias} ({strength:.1f}% confidence)")
                     else:
-                        st.info(f"🎯 {symbol} ({tf}) — Bias: {bias} ({strength:.1f}% confidence)")
+                        st.info(f"🎯 {symbol} ({tf}) – Bias: {bias} ({strength:.1f}% confidence)")
 
                     # Display confluences with better formatting
                     confluences = data.get("confluences", {})
@@ -538,176 +1127,136 @@ with col1:
                         "strength": strength,
                         "confluences": confluences,
                         "plan": plan_text,
-                        "latest_data": latest.to_dict()  # Add latest data for key levels
+                        "latest_data": latest.to_dict() if latest is not None else None
                     }
-                    assistant_entry["content"] = f"Technical analysis complete for {symbol} on {tf} timeframe."
+                    assistant_entry["content"] = f"Completed technical analysis for {symbol} on {tf} timeframe."
+                    
                 except Exception as e:
                     assistant_entry["content"] = f"Prediction error: {e}"
-                    
-        # TOKENOMICS - Only if explicitly tokenomics
+
+        # CHART ANALYSIS - Now handled in sidebar, remove from main chat flow
+        # elif ("chart" in lower or "analyze my uploaded chart" in lower) and st.session_state.uploaded_b64:
+        #     result = analyze_chart(st.session_state.uploaded_b64)
+        #     assistant_entry["kind"] = "chart"
+        #     assistant_entry["content"] = result
+        #     # Clear uploaded chart after analysis
+        #     st.session_state.uploaded_b64 = None
+
+        # TOKENOMICS - now comes AFTER prediction check
         elif is_tokenomics_request(prompt):
-            detected = None
-            coin_mappings = {
-                'bitcoin': 'bitcoin', 'btc': 'bitcoin', 'xbt': 'bitcoin',
-    'ethereum': 'ethereum', 'eth': 'ethereum',
-    'binance': 'binancecoin', 'bnb': 'binancecoin',
-
-    # Layer 1s
-    'solana': 'solana', 'sol': 'solana',
-    'cardano': 'cardano', 'ada': 'cardano',
-    'avalanche': 'avalanche-2', 'avax': 'avalanche-2',
-    'polkadot': 'polkadot', 'dot': 'polkadot',
-    'cosmos': 'cosmos', 'atom': 'cosmos',
-    'near': 'near', 'near protocol': 'near',
-    'algorand': 'algorand', 'algo': 'algorand',
-    'aptos': 'aptos', 'apt': 'aptos',
-    'sui': 'sui', 'sui network': 'sui',
-
-    # Layer 2s / Scaling
-    'polygon': 'matic-network', 'matic': 'matic-network',
-    'optimism': 'optimism', 'op': 'optimism',
-    'arbitrum': 'arbitrum', 'arb': 'arbitrum',
-    'immutable': 'immutable-x', 'imx': 'immutable-x',
-
-    # Meme Coins
-    'dogecoin': 'dogecoin', 'doge': 'dogecoin',
-    'shiba': 'shiba-inu', 'shib': 'shiba-inu',
-    'pepe': 'pepe', 'pepe coin': 'pepe',
-    'floki': 'floki', 'floki inu': 'floki',
-
-    # Stablecoins
-    'usdt': 'tether', 'tether': 'tether',
-    'usdc': 'usd-coin', 'usd coin': 'usd-coin',
-    'dai': 'dai',
-    'busd': 'binance-usd', 'binance usd': 'binance-usd',
-    'tusd': 'true-usd', 'trueusd': 'true-usd',
-
-    # Other Majors
-    'xrp': 'ripple', 'ripple': 'ripple',
-    'ltc': 'litecoin', 'litecoin': 'litecoin',
-    'link': 'chainlink', 'chainlink': 'chainlink',
-    'uni': 'uniswap', 'uniswap': 'uniswap',
-    'aave': 'aave',
-    'comp': 'compound-governance-token', 'compound': 'compound-governance-token',
-    'sand': 'the-sandbox', 'sandbox': 'the-sandbox',
-    'mana': 'decentraland', 'decentraland': 'decentraland',
-    'axs': 'axie-infinity', 'axie': 'axie-infinity',
-    'render': 'render-token', 'rndr': 'render-token',
-    'gala': 'gala',
-    'fil': 'filecoin', 'filecoin': 'filecoin',
-    'icp': 'internet-computer', 'internet computer': 'internet-computer',
-    'hbar': 'hedera-hashgraph', 'hedera': 'hedera-hashgraph',
-            }
-            for k,v in coin_mappings.items():
-                if k in lower:
-                    detected = v
-                    break
-            if not detected:
-                words = re.findall(r"[A-Za-z\-]+", lower)
-                if words:
-                    candidates = suggest_similar_tokens(words[0])
-                    if candidates:
-                        detected = candidates[0]
+            # Extract investment amount
+            investment = 1000
+            match = re.search(r'\$?(\d+(?:,\d{3})*(?:\.\d{2})?)', prompt)
+            if match:
+                investment = float(match.group(1).replace(',', ''))
             
-            # parse amount
-            amount = 1000
-            m = re.search(r'\$?(\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+(?:\.\d+)?)', prompt)
-            if m:
-                try:
-                    amount = float(m.group(1).replace(',',''))
-                except:
-                    amount = 1000
-                    
-            if not detected:
-                assistant_entry["content"] = "Please specify which coin to analyze (e.g., 'Analyze Bitcoin tokenomics' or 'Analyze SOL with $500')."
+            # Extract coin/token
+            coin = "bitcoin"
+            common_coins = {
+                "btc": "bitcoin", "bitcoin": "bitcoin",
+                "eth": "ethereum", "ethereum": "ethereum",
+                "ada": "cardano", "cardano": "cardano",
+                "sol": "solana", "solana": "solana",
+                "doge": "dogecoin", "dogecoin": "dogecoin",
+                "shib": "shiba-inu", "shiba": "shiba-inu",
+                "matic": "polygon", "polygon": "polygon",
+                "avax": "avalanche-2", "avalanche": "avalanche-2",
+                "dot": "polkadot", "polkadot": "polkadot",
+                "link": "chainlink", "chainlink": "chainlink",
+                "uni": "uniswap", "uniswap": "uniswap",
+                "xrp": "ripple", "ripple": "ripple",
+                "ltc": "litecoin", "litecoin": "litecoin"
+            }
+            
+            for key, val in common_coins.items():
+                if key in lower:
+                    coin = val
+                    break
+            
+            # If no common coin found, try fuzzy matching
+            if coin == "bitcoin" and not any(k in lower for k in common_coins.keys()):
+                tokens = re.findall(r'\b([a-z]{2,10})\b', lower)
+                if tokens:
+                    suggestions = suggest_similar_tokens(tokens[0])
+                    if suggestions:
+                        coin = suggestions[0]
+            
+            token_data = fetch_token_data(coin, investment)
+            if token_data:
+                assistant_entry["kind"] = "tokenomics"
+                assistant_entry["data"] = token_data
+                assistant_entry["content"] = f"Based on the analysis, here's what your ${investment:,} investment could look like."
             else:
-                token_data = fetch_token_data(detected, amount)
-                if not token_data:
-                    assistant_entry["content"] = f"Couldn't fetch tokenomics data for '{detected}'. Try a different coin or check your internet connection."
-                else:
-                    assistant_entry["kind"] = "tokenomics"
-                    assistant_entry["data"] = token_data
-                    assistant_entry["content"] = f"Tokenomics analysis for {token_data.get('Coin')} with ${amount:,.2f} investment."
-                    
-        # MONTE CARLO
-        elif any(k in lower for k in ["simulate","monte carlo","simulate strategy"]):
-            if simulate_trades is None:
-                assistant_entry["content"] = "Monte Carlo simulation requires 'montecarlo_module' available on the server."
-            else:
-                win = 0.6
-                rr = 1.5
-                ntr = 100
-                m = re.search(r'(\d+(?:\.\d+)?)\s*%?\s*win', lower)
-                if m:
-                    win = float(m.group(1))/100
-                m2 = re.search(r'(\d+(?:\.\d+)?)\s*(rr|r:r|risk:?reward)', lower)
-                if m2:
-                    rr = float(m2.group(1))
-                try:
-                    result = simulate_trades(win, rr, ntr, "choppy")
-                    summary = monte_carlo_summary(result)
-                    assistant_entry["kind"] = "montecarlo"
-                    assistant_entry["content"] = summary
-                except Exception as e:
-                    assistant_entry["content"] = f"Monte Carlo error: {e}"
-                    
+                assistant_entry["content"] = f"Sorry, couldn't find tokenomics data for '{coin}'. Try a different coin name or symbol."
+
         # NEWS
-        elif any(k in lower for k in ["news","what's happening","market news","headlines"]):
+        elif "news" in lower or "market" in lower or "happening" in lower:
             headlines = fetch_market_news()
             assistant_entry["kind"] = "news"
             assistant_entry["data"] = headlines
-            if AI_API_KEY:
-                msgs = flatten_conversation_for_api(st.session_state.conversation)
-                msgs.append({"role":"user","content":"Please explain these headlines in simple language for a beginner:\n" + "\n".join(headlines)})
-                ai_expl = ask_nunno(manage_history_length(msgs))
-                assistant_entry["content"] = ai_expl or ""
-            else:
-                assistant_entry["content"] = ""
-                
-        # CHART
-        elif any(k in lower for k in ["chart","analyze chart","analyze the chart","upload chart","analyze image"]):
-            if st.session_state.uploaded_b64:
-                res = analyze_chart(st.session_state.uploaded_b64)
-                assistant_entry["kind"] = "chart"
-                assistant_entry["content"] = res
-            else:
-                assistant_entry["content"] = "No chart uploaded. Please upload a chart image in the sidebar and try again."
-                
-        # DEFAULT CHAT
+            if not any("Error" in h for h in headlines):
+                # Get AI summary of news
+                news_text = "\n".join(headlines)
+                ai_messages = flatten_conversation_for_api(st.session_state.conversation)
+                ai_messages.append({"role": "user", "content": f"Explain these news headlines in simple terms for a beginner trader:\n{news_text}"})
+                ai_response = ask_nunno(ai_messages)
+                assistant_entry["content"] = ai_response
+
+        # MONTE CARLO
+        elif ("monte carlo" in lower or "simulation" in lower) and simulate_trades:
+            try:
+                results = simulate_trades(num_simulations=1000)
+                summary = monte_carlo_summary(results)
+                assistant_entry["kind"] = "montecarlo"
+                assistant_entry["content"] = summary
+            except Exception as e:
+                assistant_entry["content"] = f"Monte Carlo simulation error: {e}"
+
+        # DEFAULT AI CHAT
         else:
-            msgs = flatten_conversation_for_api(st.session_state.conversation)
-            msgs.append({"role":"user","content": prompt})
-            ai_resp = ask_nunno(manage_history_length(msgs))
-            assistant_entry["content"] = ai_resp
+            ai_messages = flatten_conversation_for_api(st.session_state.conversation)
+            ai_messages.append({"role": "user", "content": prompt})
+            ai_response = ask_nunno(ai_messages)
+            assistant_entry["content"] = ai_response
 
         st.session_state.conversation.append(assistant_entry)
+        st.session_state.conversation = manage_history_length(st.session_state.conversation)
         st.rerun()
 
 with col2:
-    st.header("Tools & Quick Actions")
-    st.subheader("Tokenomics quick test")
-    coin = st.text_input("Coin id or name (e.g., bitcoin, ethereum)", value="")
-    invest = st.number_input("Investment amount ($)", value=1000)
-    if st.button("Analyze coin (sidebar)"):
-        if coin.strip():
-            td = fetch_token_data(coin.strip(), invest)
-            if td:
-                st.table(tokenomics_df(td))
-                st.success(td.get("Health",""))
-            else:
-                st.error("Could not fetch tokenomics for that coin.")
-    st.markdown("---")
-    st.subheader("Market News")
-    if st.button("Fetch headlines"):
-        news = fetch_market_news()
-        for h in news:
-            st.markdown(h)
-    st.markdown("---")
-    st.subheader("Uploaded Chart")
+    st.subheader("Quick Info")
+    
+    # Module Status
+    st.markdown("**🧩 Features**")
+    if betterpredictormodule:
+        st.success("✅ Predictions Available")
+    else:
+        st.warning("⚠️ Predictions Module Missing")
+        
+    if simulate_trades:
+        st.success("✅ Monte Carlo Available")
+    else:
+        st.warning("⚠️ Monte Carlo Module Missing")
+    
+    # Upload status
     if st.session_state.uploaded_b64:
-        st.image("data:image/png;base64," + st.session_state.uploaded_b64, use_column_width=True)
-        if st.button("Analyze uploaded chart"):
-            res = analyze_chart(st.session_state.uploaded_b64)
-            st.text(res)
-
-st.caption("Notes: Put AI_API_KEY and NEWS_API_KEY in Streamlit secrets for full functionality. Local modules (betterpredictormodule, montecarlo_module) must be available for prediction/monte carlo features.")
+        st.success("📷 Chart Ready for Analysis")
+    else:
+        st.info("📷 No Chart Uploaded")
+        
+    st.markdown("---")
+    st.markdown("**💡 Tips**")
+    st.markdown("- Use specific coin names (BTC, ETH, ADA)")
+    st.markdown("- Include timeframes (15m, 1h, 4h, 1d)")
+    st.markdown("- Ask for predictions, tokenomics, or news")
+    st.markdown("- Upload charts for technical analysis")
+    
+    # Chart Analysis Results Section
+    if st.session_state.chart_analysis:
+        st.markdown("---")
+        st.markdown("**📈 Chart Analysis**")
+        with st.expander("View Analysis", expanded=True):
+            st.markdown(st.session_state.chart_analysis)
+            if st.button("Clear Analysis", key="clear_analysis"):
+                st.session_state.chart_analysis = None
+                st.rerun()
